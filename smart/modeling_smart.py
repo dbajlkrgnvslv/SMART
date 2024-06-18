@@ -190,8 +190,8 @@ class SMARTModel(nn.Module):
     ):
         super().__init__()
 
-        self.tokenizer = BertTokenizer.from_pretrained("/data-pool/data/data2/qiuhui/tokenizer", truncation_side='right')
-        config = BertConfig.from_pretrained("/data-pool/data/data2/qiuhui/tokenizer")
+        self.tokenizer = BertTokenizer.from_pretrained("path_to_local_bert_tokenizer", truncation_side='right')
+        config = BertConfig.from_pretrained("path_to_local_bert_config")
         self.text_transformer = BertModel(config=config)
         self.vision_transformer = vit_base_patch16_128()
         self.vision_proj = nn.Linear(self.vision_transformer.dim, hidden_size)
@@ -208,9 +208,9 @@ class SMARTModel(nn.Module):
         self.mrat_cross = Block(hidden_size, 12)
         self.mrat_self = BlockSelf(hidden_size, 12)
         self.mlp = nn.Sequential(
-            nn.Linear(hidden_size*2, 256),  # 70+51
+            nn.Linear(hidden_size*2, 256),
             nn.ReLU(),
-            nn.Linear(256, n_classes)  # Only one output neuron
+            nn.Linear(256, n_classes)
         )
         self.max_txt_len = max_txt_len
         
@@ -248,8 +248,8 @@ class SMARTModel(nn.Module):
         label = label.cuda()
         bs = image.shape[0]
 
-        image_embeds = self.vision_transformer(img = image) # bs img_len 768
-        image_embeds = self.vision_proj(image_embeds) # bs img_len 768
+        image_embeds = self.vision_transformer(img = image)
+        image_embeds = self.vision_proj(image_embeds)
 
         text_embeds = []
         for bi in range(bs):
